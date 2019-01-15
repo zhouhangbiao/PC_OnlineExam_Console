@@ -1,0 +1,120 @@
+@import "../config/variable";
+.noticeBox {
+  .noticeList {
+    width: 100%;
+  }
+  .announcementTitle {
+    display: inline-block;
+    width: 100%;
+    cursor: pointer;
+    height: 34px;
+    line-height: 36px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .time {
+    margin-right: 10px;
+  }
+  .examRead {
+    cursor: pointer;
+  }
+  .listBar {
+    a + a {
+      margin-left: 12px;
+    }
+    :global{
+      .font-primary:hover {
+        color: @brand-primary-100;
+      }
+      .font-wrong:hover {
+        color: @wrong-color;
+      }
+    }
+  }
+  :global {
+    .ant-table-scroll {
+      height: 100%;
+      overflow: inherit;
+      border: 1px solid @hr-color;
+    }
+
+    .ant-table-fixed-header .ant-table-scroll .ant-table-header {
+      position: relative;
+      z-index: 10;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      border-bottom: 0;
+    }
+
+    .ant-table-thead > tr > th {
+      background: @footer-bg-color;
+      color: #1a1a1a;
+      height: 40px;
+      line-height: 40px;
+    }
+    .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+      padding: 0;
+
+      padding-left: 10px;
+    }
+    .ant-table-thead > tr > th:first-child, .ant-table-tbody > tr > td:first-child {
+      padding-left: 20px;
+    }
+    .ant-table-fixed-header > .ant-table-content > .ant-table-scroll > .ant-table-body {
+      margin-top: 17px;
+    }
+    .ant-table-tbody > tr td:first-child,
+    .ant-table-thead > tr th:first-child {
+      min-width: 360px;
+      max-width: 500px;
+      width: auto;
+    }
+    .ant-table-tbody > tr td {
+      color: #4d4d4d;
+    }
+
+    .ant-table-tbody > tr:last-child {
+      td {
+        border-bottom: 0;
+      }
+    }
+    .ant-pagination {
+      padding-right: 20px;
+      margin-top: 10px;
+      position: relative;
+      width: 100%;
+      text-align: right;
+
+      & > li:first-child {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .ant-select-dropdown-menu {
+        background: #fff;
+        text-align: left;
+      }
+    }
+  }
+}
+
+.noticeHeader {
+  padding-top: 3px;
+  padding-bottom: 20px;
+}
+:global{
+  .el-main {
+    padding: 20px 10px;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+@media screen and (max-width: 1500px) {
+  .noticeBox{
+    .announcementTitle {
+      max-width: 340px;
+    }
+  }
+}

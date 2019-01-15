@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="yes" name="apple-touch-fullscreen">
+  <meta content="telephone=no,email=no" name="format-detection">
+  <title>首页</title>
+  ${require("html-loader?interpolate!./_assets.html")}
+</head>
+
+<body>
+  <div id="vue_app" v-cloak>
+    ${require("html-loader?interpolate!./_header.html")}
+    <el-container>
+      <el-container class="exam-container">
+        <el-main style="height:100%;">
+          <table style="vertical-align:middle;width: 100%;height: 100%;text-align: center; ">
+            <tr>
+              <td>
+                <a class="home-btn home-btn0" href="/Content/notice.html">
+                  <div class="title">在线考试系统</div>
+                  <div class="subtitle">查看在线考试系统</div>
+                </a>
+                <a class="home-btn home-btn1" @click="handleLink('diaodu')">
+                  <div class="title">判卷调度系统</div>
+                  <div class="subtitle">查看判卷调度系统</div>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </el-main>
+      </el-container>
+    </el-container>
+    ${require("html-loader?interpolate!./_footer.html")}
+  </div>
+  <div id="react_app"></div>
+</body>
+
+</html>

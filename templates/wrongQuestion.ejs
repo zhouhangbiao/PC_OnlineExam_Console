@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="yes" name="apple-touch-fullscreen">
+  <meta content="telephone=no,email=no" name="format-detection">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Cache-control" content="no-cache">
+  <meta http-equiv="Cache" content="no-cache">
+  <title>错题上报处理</title>
+  ${require("html-loader?interpolate!./_assets.html")}
+  <style>
+    .el-breadcrumb__inner,
+    .el-breadcrumb__separator {
+      color: #4d4d4d !important;
+      font-size: 16px !important;
+    }
+
+    .el-breadcrumb__item[aria-current="page"] .el-breadcrumb__inner {
+      color: #1a1a1a !important;
+    }
+
+    .el-tabs__header {
+      margin-bottom: 0 !important;
+    }
+
+    .exam-content {
+      margin-top: 20px;
+    }
+
+    .exam-content .el-tabs__content {
+      border-left: 1px solid #e6e6e6;
+      border-right: 1px solid #e6e6e6;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    .container {
+      border: 1px solid #e6e6e6;
+      margin-top: 20px;
+    }
+
+    .search-container {
+      padding-bottom: 0;
+    }
+
+    .page-container {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+
+    .list-statistics {
+      font-size: 14px;
+      color: #1a1a1a;
+      line-height: 40px;
+      padding-left: 12px;
+      padding-right: 12px;
+      border-top: 1px solid #e6e6e6;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    .el-form-item .el-form-item {
+      margin-bottom: 0 !important;
+    }
+
+    .el-upload-list__item .el-icon-close{
+      display: inline-block!important;
+    }
+
+    .upload-demo .el-upload{
+      display: inline!important;
+    }
+
+    .upload-demo .el-upload-list__item:first-child {
+      margin-top: 3px!important;
+    }
+
+    .upload-demo .el-upload-list__item .el-icon-upload-success {
+        color: #67c23a;
+        display: none;
+    }
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="vue_app" v-cloak>
+    ${require("html-loader?interpolate!./_header.html")}
+    <el-container>
+      <el-container class="exam-container">
+        ${require("html-loader?interpolate!./_sideNav.html")}
+        <el-main>
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item>考试监控</el-breadcrumb-item>
+            <el-breadcrumb-item>错题上报处理</el-breadcrumb-item>
+          </el-breadcrumb>
+          <div class="container">
+            <div class="search-container">
+              <table style="width:100%;">
+                <tr>
+                  <td>
+                    <el-form :inline="true" :model="searchParam" class="demo-form-inline" size="small">
+                      <el-form-item>
+                        <el-select v-model="searchParam.ExamSceneId" placeholder="请选择考试场次" style="width:140px;">
+                          <el-option v-for="item in ExamSceneList" :key="item.ExamSceneTimeId" :label="item.ExamSceneTimeName"
+                            :value="item.ExamSceneTimeId">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-select @change="handleQuestionCategoryChange" v-model="searchParam.CourseId" placeholder="请选择学科"
+                          style="width:115px;">
+                          <el-option v-for="item in CourseList" :key="item.CourseId" :label="item.CourseName" :value="item.CourseId">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-select v-model="searchParam.QuestionCategoryId" placeholder="请选择题型" style="width:115px;">
+                          <el-option v-for="item in QuestionCategoryList" :key="item.QuestionCategoryId" :label="item.QuestionCategoryName"
+                            :value="item.QuestionCategoryId">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-select v-model="searchParam.Status" placeholder="请选择状态" style="width:115px;">
+                          <el-option v-for="item in StatusList" :key="item.value" :label="item.text" :value="item.value">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-date-picker v-model="searchParam.BeginDateTime" type="date" style="width:130px;"
+                          value-format="yyyy-MM-dd" placeholder="上报时间" :picker-options="beginTimePickerOptions">
+                        </el-date-picker>-<el-date-picker v-model="searchParam.EndDateTime" style="width:130px;" width="130"
+                          value-format="yyyy-MM-dd" placeholder="上报时间" :picker-options="endTimePickerOptions">
+                        </el-date-picker>
+                      </el-form-item>
+                    </el-form>
+                  </td>
+                  <td style="width:252px;vertical-align: top;">
+                    <el-row style="width:250px;">
+                      <el-button type="primary" size="small" @click="handleSearchBtnClick">查询</el-button>
+                      <el-button type="primary" size="small" @click="openDialog1">导入</el-button>
+                      <el-button type="primary" size="small" @click="handleExportBtn">导出错题包</el-button>
+                    </el-row>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <template>
+              <el-table :data="list">
+                <el-table-column prop="SceneName" show-overflow-tooltip label="考试场次" align="left"></el-table-column>
+                <el-table-column prop="CourseName" label="学科" align="left" width="90"></el-table-column>
+                <el-table-column prop="SchoolName" show-overflow-tooltip label="考点名称" align="left"></el-table-column>
+                <el-table-column prop="Dog" label="加密狗编号" align="left" width="200"></el-table-column>
+                <el-table-column prop="CategoryName" label="题型" align="left" width="100"></el-table-column>
+                <el-table-column prop="QuestionId" label="试题ID" align="left" width="200">
+                  <template slot-scope="scope">
+                    <el-button @click.native.prevent="openDialog(scope.row.WrongQuestionId)" type="text" size="small">
+                      {{scope.row.QuestionId}}
+                    </el-button>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="ReportTime" label="上报时间" align="left" width="130"></el-table-column>
+                <el-table-column label="状态" align="left" width="180">
+                  <template slot-scope="scope">
+                    <span :class="{'font-wrong':scope.row.Status==1}">{{scope.row.Status | statusFilter}}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </template>
+            <template>
+              <div class="page-container">
+                <el-pagination @size-change="handleSizeChange" :background="true" @current-change="handleCurrentChange"
+                  :current-page="pager.currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pager.pageSize" layout="slot,->,prev,pager,next,sizes,jumper"
+                  :total="pager.total">
+                  <span class="el-pagination__total">显示{{(pager.currentPage-1)*pager.pageSize+1}}-{{pager.currentPage*pager.pageSize>pager.total?pager.total:pager.currentPage*pager.pageSize}}，
+                    共{{pager.total}}记录
+                  </span>
+                </el-pagination>
+              </div>
+            </template>
+          </div>
+          <!-- 弹出窗口 -->
+          <el-dialog title="错题上报" :visible.sync="dialogFormVisible" :append-to-body="true">
+            <el-card style="max-height:300px;margin-bottom:10px;overflow: auto;text-align: center;">
+              <img style="max-width:100%;" :src="form.Content" v-if="form.Content.length>0" />
+              <br />
+              <img style="max-width:100%;" :src="form.GroupContent" v-if="form.GroupContent.length>0" />
+            </el-card>
+            <el-form :model="form" :rules="rules" label-width="100px" ref="ruleForm" size="small">
+              <el-form-item label="错题类型：">
+                {{form.ReportingTypeName}}
+              </el-form-item>
+              <el-form-item label="错题描述：">
+                {{form.ReportComment}}
+              </el-form-item>
+              <hr style="background: #eeeeee;height:1px; border:none;">
+              <el-form-item label="处理意见：" v-if="!form.isReadonly" prop="ProcessType">
+                <el-radio-group v-model="form.ProcessType">
+                  <el-radio :label="2">确认有效</el-radio>
+                  <el-radio :label="3">无效,不作处理</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="处理意见：" v-else>
+                {{form.ProcessType | processTypeFilter}}
+              </el-form-item>
+              <el-form-item label="说明：" v-if="!form.isReadonly">
+                <el-input type="textarea" :rows="2" maxlength="100" placeholder="请输入不超过100字的说明" v-model="form.ProcessComment">
+                </el-input>
+              </el-form-item>
+              <el-form-item label="说明：" v-else>
+                {{form.ProcessComment}}
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <template v-if="!form.isReadonly">
+                <el-button @click="dialogFormVisible = false" size="small">取 消</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm')" size="small">确 定</el-button>
+              </template>
+              <template v-else>
+                <el-button type="primary" @click="dialogFormVisible = false" size="small">关闭</el-button>
+              </template>
+            </div>
+          </el-dialog>
+
+          <!-- 弹出窗口 -->
+          <el-dialog title="导入错题包" :visible.sync="dialogFormVisible1" :append-to-body="true" width="30%">
+            <el-form :model="form1" :rules="rules1" label-width="140px" ref="ruleForm1" size="small">
+              <el-form-item label="错题上报数据包：" prop="file">
+                <el-upload class="upload-demo" :on-success="handleFileSuccess" :on-error="handleFileError" ref="upload"
+                  :on-remove="handleFileRemove" :limit="1" action="/WrongQuestion/ImportQuestion" :file-list="fileList"
+                  :on-change="handleFileChange" :auto-upload="false">
+                  <template v-if="showFileBtn">
+                    <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+                    &nbsp;&nbsp;&nbsp;
+                    <span slot="tip" class="el-upload__tip">请导入txt格式的文件，且不超过10M</span>
+                  </template>
+                </el-upload>
+                <span class="el-form-item__error">{{errorMsg}}</span>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <template>
+                <el-button @click="dialogFormVisible1 = false" size="small">取消</el-button>
+                <el-button type="primary" @click="submitUpload()" size="small">导入</el-button>
+              </template>
+            </div>
+          </el-dialog>
+        </el-main>
+      </el-container>
+    </el-container>
+    ${require("html-loader?interpolate!./_footer.html")}
+  </div>
+  <div id="react_app"></div>
+</body>
+
+</html>

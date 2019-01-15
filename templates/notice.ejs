@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="yes" name="apple-touch-fullscreen">
+  <meta content="telephone=no,email=no" name="format-detection">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Cache-control" content="no-cache">
+  <meta http-equiv="Cache" content="no-cache">
+  <title>公告</title>
+  ${require("html-loader?interpolate!./_assets.html")}
+  <script src="/Content/assets/vendor/ckeditor/ckeditor.js"></script>
+  <style>
+    [v-cloak]{
+      display: none;
+    }
+    </style>
+</head>
+
+<body>
+  <div id="vue_app" v-cloak>
+    ${require("html-loader?interpolate!./_header.html")}
+    <el-container>
+      <el-container class="exam-container">
+        ${require("html-loader?interpolate!./_sideNav.html")}
+        <el-main>
+          <div id="notice"></div>
+          <el-dialog :title="form.OperationType=='1'?'新增公告':'修改公告'" :visible.sync="dialogFormVisible" :append-to-body="true"
+            :before-close="beforeClose">
+            <el-form :model="form" :rules="rules" label-width="100px" ref="ruleForm" size="small">
+              <el-form-item label="公告标题：" prop="AnnouncementTitle">
+                <el-input v-model="form.AnnouncementTitle" maxlength="100" placeholder="请输入公告标题"></el-input>
+              </el-form-item>
+              <el-form-item label="内容：" prop="AnnouncementContent">
+                <div id="editor"></div>
+                <el-input v-model="form.AnnouncementContent" placeholder="请输入内容" style="display:none;"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="handleCancleBtn" size="small">取消</el-button>
+              <el-button type="primary" @click="handleSaveBtn('ruleForm')" size="small">暂存</el-button>
+              <el-button type="primary" @click="handleSaveBtn('ruleForm',true)" size="small">发布</el-button>
+            </div>
+          </el-dialog>
+        </el-main>
+      </el-container>
+    </el-container>
+    ${require("html-loader?interpolate!./_footer.html")}
+  </div>
+  <div id="react_app"></div>
+</body>
+
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="yes" name="apple-touch-fullscreen">
+  <meta content="telephone=no,email=no" name="format-detection">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Cache-control" content="no-cache">
+  <meta http-equiv="Cache" content="no-cache">
+  <title>设置考生须知</title>
+  ${require("html-loader?interpolate!./_assets.html")}
+  <script src="/Content/assets/vendor/ckeditor/ckeditor.js"></script>
+
+  <style>
+    .el-breadcrumb__inner,
+    .el-breadcrumb__separator {
+      color: #4d4d4d !important;
+      font-size: 16px !important;
+    }
+
+    .el-breadcrumb__item[aria-current="page"] .el-breadcrumb__inner {
+      color: #1a1a1a !important;
+    }
+
+    .el-tabs__header {
+      margin-bottom: 0 !important;
+    }
+
+    .exam-content {
+      margin-top: 20px;
+    }
+
+    .exam-content .el-tabs__content {
+      border-left: 1px solid #e6e6e6;
+      border-right: 1px solid #e6e6e6;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    .container {
+      border: 1px solid #e6e6e6;
+      margin-top: 20px;
+    }
+
+
+
+    .search-container .el-form-item--mini.el-form-item,
+    .search-container .el-form-item--small.el-form-item {
+      margin-bottom: 0;
+    }
+
+    .page-container {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+
+    .list-statistics {
+      font-size: 14px;
+      color: #1a1a1a;
+      line-height: 40px;
+      padding-left: 12px;
+      padding-right: 12px;
+      border-top: 1px solid #e6e6e6;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+
+    .el-tree-node.is-current .el-tree-node__content {
+      background-color: #ccc !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="vue_app" v-cloak>
+    ${require("html-loader?interpolate!./_header.html")}
+    <el-container>
+      <el-container class="exam-container">
+        ${require("html-loader?interpolate!./_sideNav.html")}
+        <el-main>
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item>系统设置</el-breadcrumb-item>
+            <el-breadcrumb-item>设置考生须知</el-breadcrumb-item>
+          </el-breadcrumb>
+          <div class="search-container" style="text-align:right;background-color:#f5f6f7;">
+            <template v-if="!editable">
+              <el-button type="primary" size="small" @click="handleEditBtn" :disabled="isTimeout==1" :title="isTimeout==1?'当前时间段，不允许再修改内容。':''">修改</el-button>
+            </template>
+            <template v-else>
+              <el-button size="small" @click="handleCancelBtn">取消</el-button>
+              <el-button type="primary" size="small" @click="handleSaveBtn">保存</el-button>
+            </template>
+          </div>
+          <div id="editor" v-html="content">
+          </div>
+        </el-main>
+      </el-container>
+    </el-container>
+    ${require("html-loader?interpolate!./_footer.html")}
+  </div>
+  <div id="react_app"></div>
+</body>
+
+</html>

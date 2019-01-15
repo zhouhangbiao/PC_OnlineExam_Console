@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="yes" name="apple-touch-fullscreen">
+  <meta content="telephone=no,email=no" name="format-detection">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Cache-control" content="no-cache">
+  <meta http-equiv="Cache" content="no-cache">
+  <title>统一设置</title>
+  ${require("html-loader?interpolate!./_assets.html")}
+  <style>
+    .el-breadcrumb__inner,
+    .el-breadcrumb__separator {
+      color: #4d4d4d !important;
+      font-size: 16px !important;
+    }
+
+    .el-breadcrumb__item[aria-current="page"] .el-breadcrumb__inner {
+      color: #1a1a1a !important;
+    }
+
+    .el-tabs__header {
+      margin-bottom: 0 !important;
+    }
+
+    .exam-content {
+      margin-top: 20px;
+    }
+
+    .exam-content .el-tabs__content {
+      border: 1px solid #e6e6e6;
+      border-top: 0;
+      background: #fff;
+    }
+
+
+
+    .search-container .el-form-item--mini.el-form-item,
+    .search-container .el-form-item--small.el-form-item {
+      margin-bottom: 0;
+    }
+
+    .page-container {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+
+    .list-statistics {
+      font-size: 14px;
+      color: #1a1a1a;
+      line-height: 40px;
+      padding-left: 12px;
+      padding-right: 12px;
+      border-top: 1px solid #e6e6e6;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    .setting-list {
+      margin: 0 20px;
+      padding: 0;
+    }
+
+    .setting-list li {
+      padding: 30px 0;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    .setting-list li:last-child {
+      border-bottom: none;
+    }
+
+    .child-radio {
+      margin-left: 20px !important;
+    }
+
+    .child-radio-right {
+      margin-left: 250px !important;
+    }
+
+    .setting-content {
+      margin-top: 10px;
+    }
+
+    .setting-footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .setting-error {
+      color: #fd3131;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+
+    .el-time-range-picker__body.el-time-panel__content {
+      height:192px;
+    }
+    .el-time-panel__content {
+      height:190px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="vue_app" v-cloak>
+    ${require("html-loader?interpolate!./_header.html")}
+    <el-container>
+      <el-container class="exam-container">
+        ${require("html-loader?interpolate!./_sideNav.html")}
+        <el-main>
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item>系统设置</el-breadcrumb-item>
+            <el-breadcrumb-item>统一设置</el-breadcrumb-item>
+          </el-breadcrumb>
+          <div class='exam-content'>
+            <el-tabs v-model="activeName" type="card">
+              <el-tab-pane label="教师机设置" name="first">
+                <ul class="setting-list">
+                  <li>
+                    <div>1、教师机登录设置</div>
+                    <div class="setting-content">
+                      <el-radio-group v-model="form1.MonitorLoginSetting">
+                        <el-radio :label="'1'">允许教师机登录</el-radio>
+                        <el-radio :label="'2'">禁止教师机登录</el-radio>
+                        <el-radio :label="'3'">允许登录时间段</el-radio>
+                      </el-radio-group>
+                      <el-date-picker size="mini" :disabled="form1.MonitorLoginSetting!=3" v-model="form1.AllowMonitorLoginTime"
+                        type="datetimerange" :default-time="['00:00:00', '23:59:59']" range-separator="-"
+                        start-placeholder="选择日期时间" end-placeholder="选择日期时间">
+                      </el-date-picker>
+                      <!-- <el-date-picker :disabled="form1.MonitorLoginSetting!=3" v-model="form1.AllowMonitorLoginBeginTime"
+                        style="width:155px" type="datetime" placeholder="选择日期时间" size="mini"></el-date-picker>
+                      -
+                      <el-date-picker :disabled="form1.MonitorLoginSetting!=3" v-model="form1.AllowMonitorLoginEndTime"
+                        style="width:155px" type="datetime" placeholder="选择日期时间" size="mini"></el-date-picker> -->
+                      <span class="setting-error">{{error.e1}}</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div>2、系统当天开放时间段</div>
+                    <div class="setting-content">
+                      <el-time-picker is-range size="mini" v-model="form1.AllowMonitorSystemLoginTime"
+                        start-placeholder="开始时间" end-placeholder="结束时间" value-format="HH:mm" format="HH:mm">
+                      </el-time-picker>
+                    </div>
+                    <span class="setting-error">{{error.e9}}</span>
+                  </li>
+                  <li>
+                    <div>3、考试启动设置</div>
+                    <div class="setting-content">
+                      <el-radio-group v-model="form1.ExamOpenModel" @change="handleExamOpenModelChange">
+                        <el-radio :label="'1'" style="width:200px;">手动启动</el-radio>
+                        <el-radio :label="'2'">自动开启</el-radio>
+                      </el-radio-group>
+                    </div>
+                    <div class="setting-content">
+                      <el-radio :label="'1'" :disabled="form1.ExamOpenModel!=1" v-model="form1.OpenExamTimeSetting"
+                        class="child-radio">始终允许
+                      </el-radio>
+                    </div>
+                    <div class="setting-content">
+                      <el-radio :label="'2'" :disabled="form1.ExamOpenModel!=1" v-model="form1.OpenExamTimeSetting"
+                        class="child-radio">考试前后
+                        <el-input v-model.number="form1.AroundExamMinuteAllowOpen" :disabled="!(form1.ExamOpenModel==1&&form1.OpenExamTimeSetting==2)"
+                          @change="handleAroundExamMinuteAllowOpenChange" style="width:50px;" size="mini"></el-input>
+                        分钟方可开启
+                      </el-radio>
+                      <span class="setting-error">{{error.e2}}</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div>4、考试关闭设置</div>
+                    <div class="setting-content">
+                      <el-radio-group v-model="form1.ExamCloseModel" :disabled="true">
+                        <el-radio :label="'1'" style="width:200px;">手动关闭</el-radio>
+                        <el-radio :label="'2'">自动关闭</el-radio>
+                      </el-radio-group>
+                    </div>
+                  </li>
+                  <li>
+                    <div>5、延考设置</div>
+                    <div class="setting-content">
+                      <el-radio-group v-model="form1.IsAllowDelayExam">
+                        <el-radio :label="'1'" style="width:200px;">允许延考</el-radio>
+                        <el-radio :label="'2'">不允许延考</el-radio>
+                      </el-radio-group>
+                    </div>
+                  </li>
+                  <li>
+                    <div>6、重考设置</div>
+                    <div class="setting-content">
+                      <el-radio-group v-model="form1.IsAllowReexamination">
+                        <el-radio :label="'1'" style="width:200px;">允许重考</el-radio>
+                        <el-radio :label="'2'">不允许重考</el-radio>
+                      </el-radio-group>
+                    </div>
+                    <div class="setting-content">
+                      <el-radio :label="'1'" :disabled="form1.IsAllowReexamination!=1" v-model="form1.IsReexaminationChangePaper"
+                        class="child-radio">重考换卷
+                      </el-radio>
+                    </div>
+                    <div class="setting-content">
+                      <el-radio :label="'2'" :disabled="form1.IsAllowReexamination!=1" v-model="form1.IsReexaminationChangePaper"
+                        class="child-radio">不换卷
+                      </el-radio>
+                    </div>
+                  </li>
+                  <li>
+                    <div>7、缺考时长设置</div>
+                    <div class="setting-content">
+                      <el-radio :label="'1'" v-model="form1.MissExamTimeLengthSetting" style="width:200px;">不限制</el-radio>
+                      <el-radio :label="'2'" v-model="form1.MissExamTimeLengthSetting">开考后
+                        <el-input :disabled="form1.MissExamTimeLengthSetting!=2" v-model.number="form1.MissExamTimeThreshold"
+                          @change="handleMissExamTimeThresholdChange" style="width:50px;" size="mini"></el-input>
+                        分钟未开始，自动标记缺考
+                      </el-radio>
+                      <span class="setting-error">{{error.e3}}</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div>8、传输设置</div>
+                    <table>
+                      <tr>
+                        <td>
+                          <div class="setting-content">
+                            下载：
+                          </div>
+                        </td>
+                        <td style="width:250px;">
+                          <div class="setting-content">
+                            <el-radio :label="'1'" :disabled="true" v-model="form1.TransmissionDownloadSetting">不限速
+                            </el-radio>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="setting-content">
+                            上传：
+                          </div>
+                        </td>
+                        <td>
+                          <div class="setting-content">
+                            <el-radio :label="'1'" :disabled="true" v-model="form1.TransmissionUploadSetting">不限速
+                            </el-radio>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td>
+                          <div class="setting-content">
+                            <el-radio :label="'2'" :disabled="true" v-model="form1.TransmissionDownloadSetting">限速为
+                              <el-input :disabled="true||form1.TransmissionDownloadSetting!=2" v-model.number="form1.TransmissionDownloadLimit"
+                                @change="handleTransmissionDownloadLimitChange" style="width:50px;" size="mini"></el-input>
+                              KB/s
+                            </el-radio>
+                          </div>
+                        </td>
+                        <td></td>
+                        <td>
+                          <div class="setting-content">
+                            <el-radio :label="'2'" :disabled="true" v-model="form1.TransmissionUploadSetting">限速为
+                              <el-input :disabled="true||form1.TransmissionUploadSetting!=2" v-model.number="form1.TransmissionUploadLimit"
+                                @change="handleTransmissionUploadLimitChange" style="width:50px;" size="mini"></el-input>
+                              KB/s
+                            </el-radio>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </li>
+                  <li>
+                    <div>9、下载线程设置</div>
+                    <div class="setting-content">
+                      <el-radio-group v-model="form1.DownloadThreadCountSetting" :disabled="true">
+                        <el-radio :label="'1'" style="width:200px;">不限制</el-radio>
+                        <el-radio :label="'2'">最大线程数：
+                          <el-input :disabled="true||form1.DownloadThreadCountSetting!=2" v-model.number="form1.DownloadThreadCount"
+                            @change="handleDownloadThreadCountChange" style="width:50px;" size="mini"></el-input>
+                        </el-radio>
+                      </el-radio-group>
+                    </div>
+                  </li>
+                  <li>
+                    <div>10、考试倒计时提醒</div>
+                    <div class="setting-content">
+                      <el-radio :label="'1'" v-model="form1.MonitorRemindTimeSetting" style="width:200px;">不提醒</el-radio>
+                      <el-radio :label="'2'" v-model="form1.MonitorRemindTimeSetting">提前
+                        <el-input :disabled="form1.MonitorRemindTimeSetting!=2" v-model.number="form1.MonitorRemindTimeLength"
+                          @change="handleMonitorRemindTimeLengthChange" style="width:50px;" size="mini"></el-input>
+                        分钟提醒
+                        </el-input>
+                      </el-radio>
+                      <span class="setting-error">{{error.e7}}</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div>11、组卷方式</div>
+                    <div class="setting-content">
+                      <el-radio-group v-model="form1.GeneratePaperSetting" :disabled="true">
+                        <el-radio :label="'1'" style="width:200px;">提前组卷</el-radio>
+                        <el-radio :label="'2'">实时组卷
+                          </el-input>
+                        </el-radio>
+                      </el-radio-group>
+                    </div>
+                  </li>
+                  <li>
+                    <div>12、多选题漏选是否得分</div>
+                    <div class="setting-content">
+                      <el-radio-group v-model="form1.IsMultiSectionSelLessScored">
+                        <el-radio :label="'1'" style="width:200px;">得分</el-radio>
+                        <el-radio :label="'0'">不得分
+                          </el-input>
+                        </el-radio>
+                      </el-radio-group>
+                    </div>
+                  </li>
+                </ul>
+              </el-tab-pane>
+              <el-tab-pane label="考试机设置" name="second">
+                <div class='exam-content'>
+                  <ul class="setting-list">
+                    <li>
+                      <div>1、系统当天开放时间段</div>
+                      <div class="setting-content">
+                        <el-time-picker is-range size="mini" v-model="form1.AllowExamineSystemLoginTime"
+                          start-placeholder="开始时间" end-placeholder="结束时间" value-format="HH:mm" format="HH:mm">
+                        </el-time-picker>
+                      </div>
+                      <span class="setting-error">{{error.e10}}</span>
+                    </li>
+                    <li>
+                      <div>2、考试机答题界面样式设置</div>
+                      <div class="setting-content">
+                        <el-radio-group v-model="form1.AnswerModel">
+                          <el-radio :label="'1'" style="width:200px;">单题模式</el-radio>
+                          <el-radio :label="'2'">整卷模式</el-radio>
+                        </el-radio-group>
+                      </div>
+                    </li>
+                    <li>
+                      <div>3、考试机上下题切换设置</div>
+                      <div class="setting-content">
+                        <el-radio-group v-model="form1.IsChangeSwitch">
+                          <el-radio :label="'1'" style="width:200px;">允许切换</el-radio>
+                          <el-radio :label="'0'">禁止切换</el-radio>
+                        </el-radio-group>
+                      </div>
+                      <div class="setting-content">
+                        <el-radio :label="'1'" :disabled="form1.IsChangeSwitch!=0" v-model="form1.IsQuestionCountDown"
+                          class="child-radio-right">开启单题时间
+                        </el-radio>
+                      </div>
+                      <div class="setting-content">
+                        <el-radio :label="'2'" :disabled="form1.IsChangeSwitch!=0" v-model="form1.IsQuestionCountDown"
+                          class="child-radio-right">关闭单题时间
+                        </el-radio>
+                      </div>
+                    </li>
+                    <li>
+                      <div>4、考试倒计时提醒</div>
+                      <div class="setting-content">
+                        <el-radio :label="'1'" v-model="form1.StudentRemindTimeSetting" style="width:200px;">不提醒
+                        </el-radio>
+                        <el-radio :label="'2'" v-model="form1.StudentRemindTimeSetting">提前
+                          <el-input :disabled="form1.StudentRemindTimeSetting!=2" v-model.number="form1.StudentRemindTimeLength"
+                            @change="handleStudentRemindTimeLengthChange" style="width:50px;" size="mini"></el-input>
+                          分钟提醒
+                        </el-radio>
+                        <span class="setting-error">{{error.e8}}</span>
+                      </div>
+                    </li>
+                    <li>
+                      <div>5、座位号是否启用</div>
+                      <div class="setting-content">
+                        <el-radio-group v-model="form1.IsSeatingPlanEnabled">
+                          <el-radio :label="'1'" style="width:200px;">启用</el-radio>
+                          <el-radio :label="'0'">禁用</el-radio>
+                        </el-radio-group>
+                      </div>
+                    </li>
+                    <li>
+                      <div>6、考试过程中键盘是否启用</div>
+                      <div class="setting-content">
+                        <el-radio-group v-model="form1.IsAllowToUseKeyBoardWhenExaming">
+                          <el-radio :label="'1'" style="width:200px;">启用</el-radio>
+                          <el-radio :label="'0'">禁用</el-radio>
+                        </el-radio-group>
+                      </div>
+                    </li>
+                    <li>
+                      <div>7、同场连考考试顺序限制</div>
+                      <div class="setting-content">
+                        <el-radio-group v-model="form1.IsExamingNeedCoursesOrder">
+                          <el-radio :label="'0'" style="width:200px;">可同时考试</el-radio>
+                          <el-radio :label="'1'">先后考试</el-radio>
+                        </el-radio-group>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
+            <div class="setting-footer">
+              <el-button type="primary" size="small" @click="submitForm()" :disabled="IsTimeout==1" :title="IsTimeout==1?'当前时间段，不允许再修改设置。':''">保存
+              </el-button>
+            </div>
+          </div>
+        </el-main>
+      </el-container>
+    </el-container>
+    ${require("html-loader?interpolate!./_footer.html")}
+  </div>
+  <div id="react_app"></div>
+</body>
+
+</html>

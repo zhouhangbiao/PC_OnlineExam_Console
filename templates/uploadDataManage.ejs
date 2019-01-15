@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="yes" name="apple-touch-fullscreen">
+  <meta content="telephone=no,email=no" name="format-detection">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Cache-control" content="no-cache">
+  <meta http-equiv="Cache" content="no-cache">
+  <title>上传数据监控</title>
+  ${require("html-loader?interpolate!./_assets.html")}
+  <style>
+    .el-breadcrumb__inner,
+    .el-breadcrumb__separator {
+      color: #4d4d4d !important;
+      font-size: 16px !important;
+    }
+
+    .el-breadcrumb__item[aria-current="page"] .el-breadcrumb__inner {
+      color: #1a1a1a !important;
+    }
+
+    .el-tabs__header {
+      margin-bottom: 0 !important;
+    }
+
+    .exam-content {
+      margin-top: 20px;
+    }
+
+    .exam-content .el-tabs__content {
+      border-left: 1px solid #e6e6e6;
+      border-right: 1px solid #e6e6e6;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    .container {
+      border: 1px solid #e6e6e6;
+      margin-top: 20px;
+    }
+
+    .page-container {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+
+    .list-statistics {
+      font-size: 14px;
+      color: #1a1a1a;
+      line-height: 40px;
+      padding-left: 12px;
+      padding-right: 12px;
+      border-top: 1px solid #e6e6e6;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+    .el-tree-node__content {
+      height: 40px !important;
+    }
+
+    .el-tree-node.is-current .el-tree-node__content {
+      background-color: #ccc !important;
+    }
+    .main-left {overflow:auto;}
+    .search-container{
+      padding-bottom: 0;
+    }
+    .table-container td {
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="vue_app" v-cloak>
+    ${require("html-loader?interpolate!./_header.html")}
+    <el-container>
+      <el-container class="exam-container">
+        ${require("html-loader?interpolate!./_sideNav.html")}
+        <el-main style="padding: 0;padding-right: 10px;">
+          <table class="table-container" style="width:100%">
+            <tr>
+              <td style="width: 280px;vertical-align: top;">
+                <div class="main-left grid-content bg-purple" style="height: 100%">
+                  <el-tree :data="ExamSceneTimeList" node-key="ExamSceneTimeId" ref="tree" default-expand-all :props="defaultProps" :indent="0"
+                    @node-click="handleNodeClick" style="height: 100%">
+                    <span class="custom-tree-node" slot-scope="{ node, data }">
+                      <span>{{ node.label }}</span>
+                      <span v-if="data.UploadedExamRoomTotal">(<span style="color:#fd3131">{{data.UploadedExamRoomTotal}}</span>/{{data.ExamRoomTotal}})
+                      </span>
+                    </span>
+                  </el-tree>
+                </div>
+              </td>
+              <td style="vertical-align: top;">
+                <div class="grid-content bg-purple">
+                  <el-breadcrumb separator="/" style="height: 55px;line-height: 55px;">
+                    <el-breadcrumb-item>考试监控</el-breadcrumb-item>
+                    <el-breadcrumb-item>上传数据监控</el-breadcrumb-item>
+                  </el-breadcrumb>
+                  <div class="container" style="margin-top: 0">
+                    <div class="search-container">
+                      <table style="width:100%;">
+                        <tr>
+                          <td style="width:74px;vertical-align:top;line-height:32px;">地市/县区</td>
+                          <td>
+                            <el-form :inline="true" :model="searchParam" class="demo-form-inline" size="small">
+                              <el-form-item>
+                                <el-select @change="handleCityChange" v-model="searchParam.CityId" placeholder="请选择地市"
+                                  style="width:120px;">
+                                  <el-option v-for="item in cityList" :key="item.CityId" :label="item.CityName" :value="item.CityId">
+                                  </el-option>
+                                </el-select>
+                                <el-select :disabled="zoneList.length==0" v-model="searchParam.ZoneId" placeholder="请选择县区"
+                                  style="width:120px;">
+                                  <el-option v-for="item in zoneList" :key="item.ZoneId" :label="item.ZoneName" :value="item.ZoneId">
+                                  </el-option>
+                                </el-select>
+                              </el-form-item>
+                              <el-form-item>
+                                <el-input v-model="searchParam.SchoolName" placeholder="请输入考点名称" style="width:130px;"></el-input>
+                              </el-form-item>
+                              <el-form-item>
+                                <el-input v-model="searchParam.RoomNumber" placeholder="请输入机房编号" style="width:130px;"></el-input>
+                              </el-form-item>
+                              <el-form-item>
+                                <el-select v-model="searchParam.Isuploaded" placeholder="请选择状态" style="width:120px;">
+                                  <el-option v-for="item in uploadedStatusList" :key="item.value" :label="item.text"
+                                    :value="item.value">
+                                  </el-option>
+                                </el-select>
+                              </el-form-item>
+                              <el-form-item>
+                                <el-date-picker v-model="searchParam.UpdateDateTimeStart" type="date" style="width:130px;"
+                                  value-format="yyyy-MM-dd" placeholder="上传时间" :picker-options="beginTimePickerOptions">
+                                </el-date-picker>
+                                -
+                                <el-date-picker v-model="searchParam.UpdateDateTimeEnd" style="width:130px;" width="130"
+                                  value-format="yyyy-MM-dd" placeholder="上传时间" :picker-options="endTimePickerOptions">
+                                </el-date-picker>
+                              </el-form-item>
+                            </el-form>
+                          </td>
+                          <td style="width:60px;vertical-align:top;">
+                            <el-button type="primary" size="small" @click="handleSearchBtnClick">查询</el-button>
+                          </td>
+                        </tr>
+                      </table>
+
+                    </div>
+                    <div class="list-statistics">
+                      考点数据上传统计：<span style="color:#fd3131">{{UploadedExamRoomTotal}}</span> / {{ExamRoomTotal}}
+                    </div>
+                    <el-table :data="list" :height="tableHeight" :style="{'width':tableWidth}">
+                      <el-table-column prop="OrderIndex" label="序号" align="center" width="50"></el-table-column>
+                      <el-table-column prop="CityName" label="地市" align="left" width="80"></el-table-column>
+                      <el-table-column prop="ZoneName" label="县区" align="left" width="80"></el-table-column>
+                      <el-table-column prop="SchoolCode" show-overflow-tooltip label="考点代码" align="left"></el-table-column>
+                      <el-table-column prop="SchoolName" show-overflow-tooltip label="考点名称" align="left"></el-table-column>
+                      <el-table-column prop="RoomNumber" show-overflow-tooltip label="机房编号" align="left"></el-table-column>
+                      <el-table-column prop="DogCode" show-overflow-tooltip label="加密狗编号" align="left"></el-table-column>
+                      <el-table-column prop="LastUploadTime" label="上传时间" align="left" width="130"></el-table-column>
+                      <el-table-column label="状态" align="center" width="50">
+                        <template slot-scope="scope" v-if="scope.row.Isuploaded">
+                          <i class="el-icon-check" style="color:#409EFF;font-weight:bold;font-size:20px;"></i>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <div class="page-container">
+                      <el-pagination @size-change="handleSizeChange" :background="true" @current-change="handleCurrentChange"
+                        :current-page="pager.currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pager.pageSize"
+                        layout="slot,->,prev,pager,next,sizes,jumper" :total="pager.total">
+                        <span class="el-pagination__total">显示{{(pager.currentPage-1)*pager.pageSize+1}}-{{pager.currentPage*pager.pageSize>pager.total?pager.total:pager.currentPage*pager.pageSize}}，
+                          共{{pager.total}}记录
+                        </span>
+                      </el-pagination>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </el-main>
+      </el-container>
+    </el-container>
+    ${require("html-loader?interpolate!./_footer.html")}
+  </div>
+  <div id="react_app"></div>
+</body>
+
+</html>
